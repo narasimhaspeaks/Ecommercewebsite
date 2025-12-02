@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4 mb-5">
+
+    <h2 class="mb-4">Your Shopping Cart</h2>
+
+    {% if items %}
+        <form method="POST" action="{{ url_for('main.cart_update') }}">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th width="120">Price</th>
+                        <th width="150">Quantity</th>
+                        <th width="120">Total</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>
+                            <a href="{{ url_for('main.product_detail', product_id=item.product.id) }}">
+                                {{ item.product.name }}
+                            </a>
+                        </td>
+                        <td>${{ "%.2f"|format(item.product.price) }}</td>
+                        <td>
+                            <input type="number" 
+                                   name="qty_{{ item.product.id }}" 
+                                   value="{{ item.qty }}" 
+                                   min="0" 
+                                   class="form-control form-control-sm">
+                        </td>
+                        <td>${{ "%.2f"|format(item.subtotal) }}</td>
+                        <td>
+                            {# Note: cart_update route works via form submission for all items. #}
+                             <a href="{{ url_for('main.cart_update', product_id=item.product.id, qty=0) }}" 
+                                class="btn btn-sm btn-danger">Remove</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <button type="submit" class="btn btn-sm btn-info">Update Cart</button>
+            <a href="{{ url_for('main.cart_clear') }}" class="btn btn-sm btn-warning">Clear Cart</a>
+        </form>
+
+        <h4 class="mt-4">
+            Order Total: <span class="text-primary">${{ "%.2f"|format(total) }}</span>
+        </h4>
+
+        <a href="{{ url_for('main.checkout') }}" class="btn btn-success mt-3 btn-lg">Proceed to Checkout</a>
+
+    {% else %}
+        <p>Your cart is currently empty.</p>
+    {% endif %}
+
+</div>
+{% endblock %}

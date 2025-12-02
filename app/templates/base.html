@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{{ title if title else "Flask E-Commerce" }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <a href="{{ url_for('main.home') }}" class="brand">MyShop</a>
+
+    <form action="{{ url_for('main.home') }}" method="get" class="search">
+      <input name="q" placeholder="Search products..." value="{{ q if q else '' }}">
+      <button type="submit">Search</button>
+    </form>
+
+    <nav>
+      <a href="{{ url_for('main.cart') }}">
+        Cart ({{ session.get('cart')|length if session.get('cart') else 0 }})
+      </a>
+
+      {% if current_user.is_authenticated %}
+        <a href="{{ url_for('main.orders') }}">My Orders</a>
+
+        {% if current_user.is_admin %}
+          <a href="{{ url_for('main.admin_dashboard') }}">Admin</a>
+        {% endif %}
+
+        <a href="{{ url_for('main.logout') }}">Logout</a>
+      {% else %}
+        <a href="{{ url_for('main.login') }}">Login</a>
+        <a href="{{ url_for('main.register') }}">Register</a>
+      {% endif %}
+
+      <a href="{{ url_for('main.about') }}">About</a>
+      <a href="{{ url_for('main.contact') }}">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flashes">
+        {% for category, msg in messages %}
+          <div class="flash {{ category }}">{{ msg }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+</main>
+
+<footer>
+  <p>© MyShop 2025 — A modern online shopping experience.</p>
+</footer>
+
+</body>
+</html>

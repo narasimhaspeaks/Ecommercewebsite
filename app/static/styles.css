@@ -1,0 +1,21 @@
+body{font-family:Arial,Helvetica,sans-serif;margin:0;padding:0;background:#f7f7f7}
+header{background:#0b5ed7;color:#fff;padding:10px}
+.nav{max-width:1100px;margin:0 auto;display:flex;align-items:center;gap:10px}
+.brand{font-weight:bold;color:#fff;text-decoration:none;margin-right:20px}
+.search input{padding:6px}
+nav a{color:#fff;margin-left:12px;text-decoration:none}
+.container{max-width:1100px;margin:20px auto;padding:10px;background:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+.card{border:1px solid #ddd;padding:10px;background:#fff}
+.card img{max-width:100%;height:140px;object-fit:cover}
+.btn{display:inline-block;padding:6px 10px;background:#0b5ed7;color:#fff;text-decoration:none;border-radius:4px;margin-right:6px}
+.price{font-weight:bold;color:#0b5ed7}
+.product-page{display:flex;gap:20px}
+.product-page img{width:320px;height:240px;object-fit:cover}
+.cart-table{width:100%;border-collapse:collapse}
+.cart-table th,.cart-table td{border:1px solid #ddd;padding:8px}
+.flashes .flash{padding:8px;margin-bottom:8px;border-radius:4px}
+.flash.success{background:#d1e7dd;color:#0f5132}
+.flash.warning{background:#fff3cd;color:#664d03}
+.flash.danger{background:#f8d7da;color:#842029}
+footer{background:#222;color:#fff;padding:10px;text-align:center;margin-top:20px}

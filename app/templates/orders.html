@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>My Orders</h2>
+{% for o in orders %}
+  <div class="order">
+    <h3>Order #{{ o.id }} — ${{ "%.2f"|format(o.total) }}</h3>
+    <p>To: {{ o.fullname }} — {{ o.address }}</p>
+    <ul>
+      {% for it in o.items %}
+        <li>{{ it.name }} x {{ it.quantity }} — ${{ "%.2f"|format(it.price) }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% else %}
+  <p>No orders yet.</p>
+{% endfor %}
+{% endblock %}
