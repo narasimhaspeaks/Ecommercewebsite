@@ -1,0 +1,65 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{{ title if title else "Flask E-Commerce" }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <a href="{{ url_for('main.home') }}" class="brand">HappyKart</a>
+
+    <form action="{{ url_for('main.home') }}" method="get" class="search">
+      <input name="q" placeholder="Search products..." value="{{ q if q else '' }}">
+      <button type="submit">Search</button>
+    </form>
+
+    <nav>
+      <a href="{{ url_for('main.cart') }}" {% if request.endpoint == 'main.cart' %}class="active"{% endif %}>
+        Cart ({{ session.get('cart')|length if session.get('cart') else 0 }})
+      </a>
+
+      {% if current_user.is_authenticated %}
+        <span class="user-info">Logged in as <strong>{{ current_user.username }}</strong></span>
+        <a href="{{ url_for('main.orders') }}" {% if request.endpoint == 'main.orders' %}class="active"{% endif %}>My Orders</a>
+        {% set unread = current_user.notifications | selectattr('is_read','equalto',False) | list | length if current_user.is_authenticated else 0 %}
+        <a href="{{ url_for('main.notifications') }}" {% if request.endpoint == 'main.notifications' %}class="active"{% endif %}>Notifications ({{ unread }})</a>
+
+        {% if current_user.is_admin %}
+          <a href="{{ url_for('main.admin_dashboard') }}" {% if request.endpoint == 'main.admin_dashboard' %}class="active"{% endif %}>Admin</a>
+        {% endif %}
+
+        <a href="{{ url_for('main.logout') }}">Logout</a>
+      {% else %}
+        <a href="{{ url_for('main.login') }}" {% if request.endpoint == 'main.login' %}class="active"{% endif %}>Login</a>
+        <a href="{{ url_for('main.register') }}" {% if request.endpoint == 'main.register' %}class="active"{% endif %}>Register</a>
+      {% endif %}
+
+      <a href="{{ url_for('main.about') }}" {% if request.endpoint == 'main.about' %}class="active"{% endif %}>About</a>
+      <a href="{{ url_for('main.contact') }}" {% if request.endpoint == 'main.contact' %}class="active"{% endif %}>Contact</a>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flashes">
+        {% for category, msg in messages %}
+          <div class="flash {{ category }}">{{ msg }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+</main>
+
+<footer>
+  <p>© HappyKart 2025 — A modern online shopping experience.</p>
+</footer>
+
+</body>
+</html>

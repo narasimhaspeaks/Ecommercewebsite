@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="auth-container">
+    <div class="auth-form">
+        <h2>Create Your Account</h2>
+        <p class="auth-subtitle">Join HappyKart and start shopping</p>
+
+        <form method="POST">
+            {{ form.hidden_tag() }}
+
+            <div class="form-group">
+                {{ form.username.label(class="form-label") }}
+                {{ form.username(class="form-input", placeholder="Choose a username") }}
+                {% if form.username.errors %}
+                    <span class="form-error">{{ form.username.errors[0] }}</span>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.email.label(class="form-label") }}
+                {{ form.email(class="form-input", placeholder="Enter your email") }}
+                {% if form.email.errors %}
+                    <span class="form-error">{{ form.email.errors[0] }}</span>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.password.label(class="form-label") }}
+                {{ form.password(class="form-input", placeholder="Create a strong password") }}
+                {% if form.password.errors %}
+                    <span class="form-error">{{ form.password.errors[0] }}</span>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.confirm_password.label(class="form-label") }}
+                {{ form.confirm_password(class="form-input", placeholder="Confirm your password") }}
+                {% if form.confirm_password.errors %}
+                    <span class="form-error">{{ form.confirm_password.errors[0] }}</span>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.submit(class="btn btn-register") }}
+            </div>
+
+            <p class="auth-link">
+                Already have an account?
+                <a href="{{ url_for('main.login') }}">Sign in here</a>
+            </p>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="checkout-container">
+    <div class="checkout-wrapper">
+        <!-- Left Section: Checkout Form -->
+        <div class="checkout-form-section">
+            <h2 class="checkout-title">Complete Your Order</h2>
+
+            <form method="post" id="checkoutForm">
+                {{ form.hidden_tag() }}
+
+                <!-- Shipping Information Section -->
+                <div class="checkout-section">
+                    <h3 class="section-title">
+                        <span class="section-number">1</span>
+                        Shipping Information
+                    </h3>
+
+                    <div class="form-group">
+                        {{ form.fullname.label(class="form-label") }}
+                        {{ form.fullname(class="form-input", placeholder="Full Name") }}
+                        {% if form.fullname.errors %}
+                            <span class="form-error">{{ form.fullname.errors[0] }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.email.label(class="form-label") }}
+                        {{ form.email(class="form-input", placeholder="your@email.com") }}
+                        {% if form.email.errors %}
+                            <span class="form-error">{{ form.email.errors[0] }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.address.label(class="form-label") }}
+                        {{ form.address(class="form-input form-textarea", rows=4, placeholder="Street Address, City, State, ZIP") }}
+                        {% if form.address.errors %}
+                            <span class="form-error">{{ form.address.errors[0] }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Payment Information Section -->
+                <div class="checkout-section">
+                    <h3 class="section-title">
+                        <span class="section-number">2</span>
+                        Payment Information
+                    </h3>
+
+                    <div class="form-group">
+                        {{ form.card_number.label(class="form-label") }}
+                        {{ form.card_number(class="form-input card-input", placeholder="1234 5678 9012 3456", id="cardNumber", maxlength="19") }}
+                        {% if form.card_number.errors %}
+                            <span class="form-error">{{ form.card_number.errors[0] }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            {{ form.expiry_date.label(class="form-label") }}
+                            {{ form.expiry_date(class="form-input", placeholder="MM/YY") }}
+                            {% if form.expiry_date.errors %}
+                                <span class="form-error">{{ form.expiry_date.errors[0] }}</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            {{ form.cvc.label(class="form-label") }}
+                            {{ form.cvc(class="form-input cvc-input", placeholder="•••", id="cvcInput", type="password", maxlength="3") }}
+                            {% if form.cvc.errors %}
+                                <span class="form-error">{{ form.cvc.errors[0] }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="security-badge">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                        </svg>
+                        <span>Your payment information is secure and encrypted</span>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn-checkout">{{ form.submit.label }}</button>
+            </form>
+        </div>
+
+        <!-- Right Section: Order Summary -->
+        <div class="checkout-summary-section">
+            <h3 class="summary-title">Order Summary</h3>
+
+            <div class="order-items">
+                {% for p, qty in items %}
+                    <div class="order-item">
+                        <div class="item-info">
+                            <p class="item-name">{{ p.name }}</p>
+                            <p class="item-qty">Qty: {{ qty }}</p>
+                        </div>
+                        <p class="item-price">${{ "%.2f"|format(p.price * qty) }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="price-breakdown">
+                <div class="price-row">
+                    <span>Subtotal</span>
+                    <span>${{ "%.2f"|format(total) }}</span>
+                </div>
+                <div class="price-row">
+                    <span>Shipping</span>
+                    <span class="shipping-free">FREE</span>
+                </div>
+                <div class="price-row">
+                    <span>Tax</span>
+                    <span>${{ "%.2f"|format(total * 0.08) }}</span>
+                </div>
+            </div>
+
+            <div class="price-total">
+                <span>Total Amount</span>
+                <span class="total-amount">${{ "%.2f"|format(total * 1.08) }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Mask CVC input to show dots instead of numbers
+    const cvcInput = document.getElementById('cvcInput');
+    const cardInput = document.getElementById('cardNumber');
+    let cvcValue = '';
+    let cardValue = '';
+
+    cvcInput.addEventListener('input', function(e) {
+        // Get only the new input
+        let inputValue = e.data;
+        
+        // If backspace or delete, remove last digit
+        if (e.inputType === 'deleteContentBackward' || e.inputType === 'deleteContentForward') {
+            cvcValue = cvcValue.slice(0, -1);
+        } 
+        // If adding a digit
+        else if (inputValue && /\d/.test(inputValue) && cvcValue.length < 3) {
+            cvcValue += inputValue;
+        }
+        
+        // Display dots
+        e.target.value = '•'.repeat(cvcValue.length);
+    });
+
+    // Format card number with spaces - simple approach
+    cardInput.addEventListener('input', function(e) {
+        // Remove all non-digits
+        let digitsOnly = e.target.value.replace(/\D/g, '');
+        
+        // Limit to 16 digits
+        digitsOnly = digitsOnly.slice(0, 16);
+        cardValue = digitsOnly;
+        
+        // Format with spaces every 4 digits
+        let formatted = '';
+        for (let i = 0; i < digitsOnly.length; i++) {
+            if (i > 0 && i % 4 === 0) {
+                formatted += ' ';
+            }
+            formatted += digitsOnly[i];
+        }
+        
+        e.target.value = formatted;
+    });
+
+    // Before form submission, restore actual card value without spaces and CVC value
+    document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+        cardInput.value = cardValue;
+        cvcInput.value = cvcValue;
+    });
+</script>
+{% endblock %}

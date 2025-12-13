@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+
+    <div class="row">
+        <div class="col-md-5">
+            <img src="{{ product.image_url }}" class="img-fluid rounded border" alt="{{ product.name }}" style="max-width: 100%; height: auto; max-height: 400px; object-fit: cover;">
+        </div>
+
+        <div class="col-md-7">
+            <h2>{{ product.name }}</h2>
+            <h4 class="text-primary">${{ product.price }}</h4>
+
+            <p style="color: #28a745; font-weight: bold; font-size: 16px;">✓ In Stock: {{ product.stock }} available</p>
+
+            <p class="mt-3">{{ product.description }}</p>
+
+            <form method="post" action="{{ url_for('main.add_to_cart', product_id=product.id) }}">
+                <button class="btn btn-primary btn-lg mt-2">Add to Cart</button>
+            </form>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Order {{ order.order_code }} Details{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8">
+            <h2>Order {{ order.order_code }} Details</h2>
+            <hr>
+            
+            <h5>Customer Information</h5>
+            <p><strong>Name:</strong> {{ order.fullname }}</p>
+            <p><strong>Email:</strong> {{ order.email }}</p>
+            <p><strong>Shipping Address:</strong> {{ order.address }}</p>
+            
+            <h5 class="mt-4">Order Items</h5>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.items %}
+                    <tr>
+                        <td>{{ item.name }}</td>
+                        <td>${{ "%.2f"|format(item.price) }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>${{ "%.2f"|format(item.price * item.quantity) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <h5 class="mt-4">Order Summary</h5>
+            <p><strong>Total Amount:</strong> ${{ "%.2f"|format(order.total) }}</p>
+            
+            <div class="mt-4">
+                <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+                <form method="POST" action="{{ url_for('main.admin_confirm_order', order_id=order.id) }}" style="display:inline;">
+                    <button type="submit" class="btn btn-success">Confirm Order</button>
+                </form>
+                <form method="POST" action="{{ url_for('main.admin_cancel_order', order_id=order.id) }}" style="display:inline;">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to cancel this order?');">Cancel Order</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

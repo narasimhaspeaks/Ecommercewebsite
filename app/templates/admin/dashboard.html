@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="admin-container">
+    <div class="admin-header">
+        <h2 class="admin-title">Admin Dashboard</h2>
+        <a href="{{ url_for('main.admin_products') }}" class="btn-admin-primary">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="16"></line>
+                <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
+            Manage Products
+        </a>
+    </div>
+
+    <div class="dashboard-stats">
+        <div class="stat-card">
+            <div class="stat-icon stat-icon-blue">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                </svg>
+            </div>
+            <div class="stat-info">
+                <p class="stat-label">Total Orders</p>
+                <p class="stat-value">{{ orders|length }}</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon stat-icon-green">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+            </div>
+            <div class="stat-info">
+                <p class="stat-label">Revenue</p>
+                <p class="stat-value">${{ "%.2f"|format(orders|sum(attribute='total')) if orders else "0.00" }}</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon stat-icon-orange">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+                    <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+                </svg>
+            </div>
+            <div class="stat-info">
+                <p class="stat-label">Products</p>
+                <p class="stat-value">{{ products|length }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-header">
+        <h3 class="section-title">Recent Orders</h3>
+    </div>
+
+    {% if orders %}
+    <div class="admin-table-wrapper">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Order Code</th>
+                    <th>Customer</th>
+                    <th>Email</th>
+                    <th>Total Amount</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for o in orders %}
+                <tr>
+                    <td><span class="order-code">{{ o.order_code }}</span></td>
+                    <td class="customer-name">{{ o.fullname }}</td>
+                    <td class="customer-email">{{ o.email }}</td>
+                    <td class="order-total">${{ "%.2f"|format(o.total) }}</td>
+                    <td>
+                        {% if o.status == 'confirmed' %}
+                            <span class="status-badge status-confirmed">Confirmed</span>
+                        {% elif o.status == 'cancelled' %}
+                            <span class="status-badge status-cancelled">Cancelled</span>
+                        {% else %}
+                            <span class="status-badge status-pending">Pending</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="action-buttons">
+                            <a href="{{ url_for('main.admin_order_details', order_id=o.id) }}" class="btn-action btn-view" title="View Details">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                                View
+                            </a>
+                            <form method="POST" action="{{ url_for('main.admin_confirm_order', order_id=o.id) }}" style="display:inline">
+                                <button type="submit" class="btn-action btn-confirm" title="Confirm Order">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                    Confirm
+                                </button>
+                            </form>
+                            <form method="POST" action="{{ url_for('main.admin_cancel_order', order_id=o.id) }}" style="display:inline" onsubmit="return confirm('Are you sure you want to cancel this order?')">
+                                <button type="submit" class="btn-action btn-cancel" title="Cancel Order">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                    Cancel
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <p>No orders yet. Orders will appear here once customers place them.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

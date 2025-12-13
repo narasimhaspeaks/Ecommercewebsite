@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+
+    <div class="alert alert-info" role="alert">
+        <h4>Order #{{ order.id }}</h4>
+        <p><strong>Status:</strong> 
+            {% if order.status == 'pending' %}
+                <span class="badge badge-warning">Pending Confirmation</span>
+            {% elif order.status == 'confirmed' %}
+                <span class="badge badge-success">Confirmed</span>
+            {% elif order.status == 'shipped' %}
+                <span class="badge badge-info">Shipped</span>
+            {% elif order.status == 'delivered' %}
+                <span class="badge badge-success">Delivered</span>
+            {% elif order.status == 'cancelled' %}
+                <span class="badge badge-danger">Cancelled</span>
+            {% endif %}
+        </p>
+    </div>
+
+    {% if order.status == 'pending' %}
+    <div class="alert alert-warning">
+        <strong>⏳ Your order is pending admin confirmation.</strong> 
+        <p>We'll notify you once your order is confirmed and will provide tracking information.</p>
+    </div>
+    {% endif %}
+
+    {% if order.status == 'confirmed' %}
+    <div class="alert alert-success">
+        <strong>✓ Order Confirmed!</strong>
+        <p>Tracking Number: <strong>{{ order.tracking_number or 'N/A' }}</strong></p>
+        <p>Expected Delivery: <strong>{{ order.expected_delivery.strftime('%B %d, %Y') if order.expected_delivery else 'TBD' }}</strong></p>
+        <p>Shipping To: <strong>{{ order.address }}</strong></p>
+    </div>
+    {% endif %}
+
+    {% if order.status == 'shipped' %}
+    <div class="alert alert-info">
+        <strong>📦 Your order is on the way!</strong>
+        <p>Tracking Number: <strong>{{ order.tracking_number or 'N/A' }}</strong></p>
+        <p>Expected Delivery: <strong>{{ order.expected_delivery.strftime('%B %d, %Y') if order.expected_delivery else 'TBD' }}</strong></p>
+    </div>
+    {% endif %}
+
+    {% if order.status == 'delivered' %}
+    <div class="alert alert-success">
+        <strong>✓ Order Delivered!</strong>
+        <p>Your order has been delivered on {{ order.expected_delivery.strftime('%B %d, %Y') if order.expected_delivery else 'today' }}</p>
+    </div>
+    {% endif %}
+
+    {% if order.status == 'cancelled' %}
+    <div class="alert alert-danger">
+        <strong>✗ Order Cancelled</strong>
+        <p>Your order has been cancelled. Please contact support for more information.</p>
+    </div>
+    {% endif %}
+
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5>Order Details</h5>
+        </div>
+        <div class="card-body">
+            <p><strong>Order ID:</strong> #{{ order.id }}</p>
+            <p><strong>Date Ordered:</strong> {{ order.created_at.strftime('%B %d, %Y at %I:%M %p') }}</p>
+            <p><strong>Customer Name:</strong> {{ order.fullname }}</p>
+            <p><strong>Email:</strong> {{ order.email }}</p>
+            <p><strong>Delivery Address:</strong> {{ order.address }}</p>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header">
+            <h5>Items</h5>
+        </div>
+        <div class="card-body">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in order.items %}
+                    <tr>
+                        <td>{{ item.name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>${{ "%.2f"|format(item.price) }}</td>
+                        <td>${{ "%.2f"|format(item.price * item.quantity) }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr style="font-weight: bold;">
+                        <td colspan="3" style="text-align: right;">Total:</td>
+                        <td>${{ "%.2f"|format(order.total) }}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a href="{{ url_for('main.orders') }}" class="btn btn-secondary">Back to My Orders</a>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="orders-container">
+    <div class="orders-header">
+        <h2 class="orders-title">My Orders</h2>
+        <p class="orders-subtitle">Track and manage your purchases</p>
+    </div>
+
+    {% if orders %}
+        <div class="orders-list">
+        {% for o in orders %}
+            <div class="order-card">
+                <div class="order-header">
+                    <div class="order-info">
+                        <h3 class="order-id">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                                <line x1="3" y1="6" x2="21" y2="6"></line>
+                                <path d="M16 10a4 4 0 0 1-8 0"></path>
+                            </svg>
+                            Order #{{ o.order_code }}
+                        </h3>
+                        {% if o.status == 'confirmed' %}
+                            <span class="order-status-badge status-confirmed">Confirmed</span>
+                        {% elif o.status == 'cancelled' %}
+                            <span class="order-status-badge status-cancelled">Cancelled</span>
+                        {% else %}
+                            <span class="order-status-badge status-pending">Pending Confirmation</span>
+                        {% endif %}
+                    </div>
+                    <div class="order-total-box">
+                        <span class="order-total-label">Total</span>
+                        <span class="order-total-amount">${{ "%.2f"|format(o.total) }}</span>
+                    </div>
+                </div>
+
+                <div class="order-shipping">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                    <div class="shipping-details">
+                        <p class="shipping-name">{{ o.fullname }}</p>
+                        <p class="shipping-address">{{ o.address }}</p>
+                    </div>
+                </div>
+
+                <div class="order-items">
+                    <h4 class="items-title">Order Items</h4>
+                    <div class="items-list">
+                        {% for it in o.items %}
+                            <div class="order-item">
+                                <div class="item-details">
+                                    <span class="item-name">{{ it.name }}</span>
+                                    <span class="item-qty">Qty: {{ it.quantity }}</span>
+                                </div>
+                                <span class="item-price">${{ "%.2f"|format(it.price * it.quantity) }}</span>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-orders">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <path d="M16 16s-1.5-2-4-2-4 2-4 2"></path>
+                <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                <line x1="15" y1="9" x2="15.01" y2="9"></line>
+            </svg>
+            <h3>No Orders Yet</h3>
+            <p>You haven't placed any orders. Start shopping to see your orders here!</p>
+            <a href="{{ url_for('main.home') }}" class="btn-shop-now">Browse Products</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

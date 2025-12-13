@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="notifications-page">
+    <div class="notifications-header">
+        <h2 class="notifications-title">Your Notifications</h2>
+        {% if notifications %}
+        <form method="POST" action="{{ url_for('main.clear_all_notifications') }}" style="display:inline" onsubmit="return confirm('Are you sure you want to delete all notifications?')">
+            <button type="submit" class="btn-clear-all">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+                Clear All
+            </button>
+        </form>
+        {% endif %}
+    </div>
+
+    {% if notifications %}
+        <div class="notifications-list">
+        {% for n in notifications %}
+            <div class="notification-card {% if not n.is_read %}notification-unread{% endif %}">
+                <div class="notification-content">
+                    <div class="notification-icon">
+                        {% if not n.is_read %}
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <circle cx="12" cy="12" r="10"></circle>
+                        </svg>
+                        {% else %}
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        {% endif %}
+                    </div>
+                    <div class="notification-body">
+                        <p class="notification-message">{{ n.message }}</p>
+                        <span class="notification-time">{{ n.created_at.strftime('%B %d, %Y at %I:%M %p') }}</span>
+                    </div>
+                    <div class="notification-actions">
+                        {% if not n.is_read %}
+                        <form method="POST" action="{{ url_for('main.mark_notification_read', note_id=n.id) }}" style="display:inline">
+                            <button type="submit" class="btn-mark-read" title="Mark as read">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                            </button>
+                        </form>
+                        {% else %}
+                        <span class="read-badge">Read</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-notifications">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+            </svg>
+            <h3>No Notifications</h3>
+            <p>You're all caught up! No new notifications at the moment.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

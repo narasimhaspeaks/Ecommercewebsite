@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4 mb-5">
+
+    <h2 class="mb-4">Your Shopping Cart</h2>
+
+    {% if items %}
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th width="120">Price</th>
+                    <th width="150">Quantity</th>
+                    <th width="120">Total</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr data-product-id="{{ item.product.id }}" data-price="{{ item.product.price }}">
+                    <td>
+                        <a href="{{ url_for('main.product_detail', product_id=item.product.id) }}">
+                            {{ item.product.name }}
+                        </a>
+                    </td>
+                    <td class="price-cell">${{ "%.2f"|format(item.product.price) }}</td>
+                    <td>
+                        <input type="number" 
+                               class="quantity-input form-control form-control-sm"
+                               data-product-id="{{ item.product.id }}"
+                               value="{{ item.qty }}" 
+                               min="1" 
+                               max="999"
+                               style="width: 80px;">
+                    </td>
+                    <td class="total-cell">${{ "%.2f"|format(item.subtotal) }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('main.remove_from_cart') }}" style="display:inline;">
+                            <input type="hidden" name="product_id" value="{{ item.product.id }}">
+                            <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <form method="POST" action="{{ url_for('main.cart_update') }}" id="update-cart-form" style="margin-top: 20px; display:none;">
+            <!-- Hidden quantity fields will be added here by JavaScript -->
+        </form>
+        
+        <button type="button" class="btn btn-sm btn-info" onclick="updateCart()">Update Cart</button>
+        <a href="{{ url_for('main.cart_clear') }}" class="btn btn-sm btn-warning">Clear Cart</a>
+
+        <h4 class="mt-4">
+            Order Total: <span class="text-primary" id="order-total">${{ "%.2f"|format(total) }}</span>
+        </h4>
+
+        <a href="{{ url_for('main.checkout') }}" class="btn btn-success mt-3 btn-lg">Proceed to Checkout</a>
+
+    {% else %}
+        <p>Your cart is currently empty.</p>
+    {% endif %}
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add event listeners to all quantity inputs
+    const quantityInputs = document.querySelectorAll('.quantity-input');
+    quantityInputs.forEach(input => {
+        input.addEventListener('change', updatePriceDisplay);
+    });
+});
+
+function updatePriceDisplay() {
+    let orderTotal = 0;
+    
+    // Update each row's total
+    document.querySelectorAll('tr[data-product-id]').forEach(row => {
+        const price = parseFloat(row.dataset.price);
+        const quantityInput = row.querySelector('.quantity-input');
+        const quantity = parseInt(quantityInput.value) || 0;
+        const rowTotal = price * quantity;
+        
+        // Update the total cell for this row
+        const totalCell = row.querySelector('.total-cell');
+        totalCell.textContent = '$' + rowTotal.toFixed(2);
+        
+        orderTotal += rowTotal;
+    });
+    
+    // Update order total
+    document.getElementById('order-total').textContent = '$' + orderTotal.toFixed(2);
+}
+
+function updateCart() {
+    const form = document.getElementById('update-cart-form');
+    form.innerHTML = ''; // Clear existing fields
+    
+    // Add all quantity inputs to the form
+    document.querySelectorAll('.quantity-input').forEach(input => {
+        const hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'qty_' + input.dataset.productId;
+        hiddenInput.value = input.value;
+        form.appendChild(hiddenInput);
+    });
+    
+    // Submit the form
+    form.submit();
+}
+</script>
+{% endblock %}
